@@ -17,19 +17,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
-import org.json.JSONObject;
-
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
-import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -73,9 +73,6 @@ public class MainActivity extends Activity {
             Log.i("BumpCard", "LOCATION " + currentLocation.get().toString());
         });
 
-        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        //StrictMode.setThreadPolicy(policy);
-
         sensorManager.registerListener(new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -87,29 +84,31 @@ public class MainActivity extends Activity {
 
                 if (magnitude > threshold) {
                     Log.i("BumpCard", "BUMP " + magnitude + " " + Arrays.toString(event.values));
-                    /*try {
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("timestamp", 1);
-                        jsonObject.put("magnitude", 2);
-
-                        OkHttpClient client = new OkHttpClient();
-                        RequestBody body = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
-                        Request request = new Request.Builder()
-                                .url("http://127.0.0.1:8000/bump/") // TODO: server must be visible to Android device, e.g. in same network
-                                .post(body)
-                                .build();
-
-                        try (Response response = client.newCall(request).execute()) {
-                            Log.i("BumpCard", "SERVER RESPONSE " + response.body().string());
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }*/
                 }
             }
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int i) {}
         }, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("username", "user1")
+                .addFormDataPart("password", "password1")
+                .build();
+        Request request = new Request.Builder()
+                .url("http://192.168.1.100:5000/register")
+                .method("POST", body)
+                .build();
+
+        executorService.submit(() -> {
+            try (Response response = client.newCall(request).execute()) {
+                Log.i("BumpCard", "HTTP status: " + response.code());
+                Log.i("BumpCard", "SERVER RESPONSE " + response.body().string());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
