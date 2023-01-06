@@ -1,13 +1,13 @@
-package com.bumpcard;
+package com.bumpcard.activity;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -23,22 +23,31 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import com.bumpcard.databinding.ActivityMainBinding;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     ConnectivityManager connectivityManager;
     LocationManager locationManager;
     SensorManager sensorManager;
     AtomicReference<Location> currentLocation = new AtomicReference<>();
 
+    private ActivityMainBinding binding;
+    private SharedPreferences sharedPreferences;
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        sharedPreferences = getSharedPreferences("user", Context.MODE_PRIVATE);
 
         ActivityCompat.requestPermissions(this, new String[]{ACCESS_NETWORK_STATE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION}, 1);
         if (ActivityCompat.checkSelfPermission(this, ACCESS_NETWORK_STATE) != PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
@@ -73,7 +82,7 @@ public class MainActivity extends Activity {
                 float x = event.values[0];
                 float y = event.values[1];
                 float z = event.values[2];
-                float magnitude = (float) Math.sqrt(x*x + y*y + z*z);
+                float magnitude = (float) Math.sqrt(x * x + y * y + z * z);
 
                 if (magnitude > threshold) {
                     Log.i("BumpCard", "BUMP " + magnitude + " " + Arrays.toString(event.values));
@@ -81,10 +90,28 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {}
+            public void onAccuracyChanged(Sensor sensor, int i) {
+            }
         }, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+    }
 
-        View registrationActivity = findViewById(R.id.go_to_register_button);
-        registrationActivity.setOnClickListener((view) -> startActivity(new Intent(getApplicationContext(), RegistrationActivity.class)));
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String api_key = sharedPreferences.getString("api_key", "");
+        if (api_key.isEmpty()) {
+            binding.goToRegisterButton.setVisibility(View.VISIBLE);
+            binding.goToSetUserDetailsButton.setVisibility(View.GONE);
+            binding.goToRegisterButton.setOnClickListener(view ->
+                    startActivity(new Intent(getApplicationContext(), RegistrationActivity.class))
+            );
+        } else {
+            binding.goToRegisterButton.setVisibility(View.GONE);
+            binding.goToSetUserDetailsButton.setVisibility(View.VISIBLE);
+            binding.goToSetUserDetailsButton.setOnClickListener(view ->
+                    startActivity(new Intent(getApplicationContext(), SetUserDetailsActivity.class))
+            );
+        }
     }
 }

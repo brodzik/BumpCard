@@ -3,4 +3,10 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="headline">Headline</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="set_user_details">Set user details</string>
 </resources>
