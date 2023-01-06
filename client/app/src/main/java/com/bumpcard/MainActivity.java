@@ -7,6 +7,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,22 +19,14 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class MainActivity extends Activity {
     ConnectivityManager connectivityManager;
@@ -91,24 +84,7 @@ public class MainActivity extends Activity {
             public void onAccuracyChanged(Sensor sensor, int i) {}
         }, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
 
-        OkHttpClient client = new OkHttpClient().newBuilder().build();
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("username", "user1")
-                .addFormDataPart("password", "password1")
-                .build();
-        Request request = new Request.Builder()
-                .url("http://192.168.1.100:5000/register")
-                .method("POST", body)
-                .build();
-
-        executorService.submit(() -> {
-            try (Response response = client.newCall(request).execute()) {
-                Log.i("BumpCard", "HTTP status: " + response.code());
-                Log.i("BumpCard", "SERVER RESPONSE " + response.body().string());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        View registrationActivity = findViewById(R.id.go_to_register_button);
+        registrationActivity.setOnClickListener((view) -> startActivity(new Intent(getApplicationContext(), RegistrationActivity.class)));
     }
 }
