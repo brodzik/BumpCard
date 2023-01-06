@@ -8,9 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumpcard.R;
 import com.bumpcard.databinding.ActivityRegistrationBinding;
-import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONObject;
 
@@ -51,7 +49,6 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private Request buildRequest() {
-
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("username", binding.inputRegisterUsername.getText().toString())

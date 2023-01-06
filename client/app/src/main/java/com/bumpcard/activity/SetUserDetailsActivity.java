@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumpcard.databinding.ActivitySetUserDetailsBinding;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -45,6 +46,60 @@ public class SetUserDetailsActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
             finish();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Request request = new Request.Builder()
+                .url(API_URL)
+                .get()
+                .addHeader("api_key", sharedPreferences.getString("api_key", ""))
+                .build();
+        try {
+            JSONObject userInfo = new JSONObject(getUserInfo(request));
+            binding.inputSetUserFirstName.setText(userInfo.getString("first_name"));
+            binding.inputSetUserLastName.setText(userInfo.getString("last_name"));
+            binding.inputSetUserHeadline.setText(userInfo.getString("headline"));
+            binding.inputSetUserEmail.setText(userInfo.getString("email"));
+            binding.inputSetUserPhone.setText(userInfo.getString("phone"));
+        } catch (JSONException e) {
+            Log.e("SetUserDetailsActivity", "onResume(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private String getUserInfo(Request request) {
+        try {
+            return EXECUTOR_SERVICE.submit(() -> {
+                try (Response response = CLIENT.newCall(request).execute()) {
+                    int code = response.code();
+                    Log.d("SetUserDetailsActivity", "GET /info response code: " + code);
+                    if (code != 200) {
+                        return "";
+                    }
+
+                    ResponseBody responseBody = response.body();
+                    if (responseBody == null) {
+                        Log.d("SetUserDetailsActivity", "GET /info response body is null");
+                        return "";
+                    }
+
+                    String responseText = responseBody.string();
+                    Log.d("SetUserDetailsActivity", "GET /info response body: " + responseText);
+                    return responseText;
+                } catch (IOException e) {
+                    Log.e("SetUserDetailsActivity", e.getMessage());
+                    e.printStackTrace();
+                    return "";
+                }
+            }).get();
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e("SetUserDetailsActivity", e.getMessage());
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private String setUserDetails() {

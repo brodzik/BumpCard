@@ -12,7 +12,7 @@
         android:layout_height="65dp"
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="16dp"
-        android:text="@string/set_user_details"
+        android:text="@string/user_details"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
