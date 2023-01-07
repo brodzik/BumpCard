@@ -93,25 +93,35 @@ public class MainActivity extends AppCompatActivity {
             public void onAccuracyChanged(Sensor sensor, int i) {
             }
         }, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+
+        binding.goToRegisterButton.setOnClickListener(view ->
+                startActivity(new Intent(getApplicationContext(), RegistrationActivity.class))
+        );
+        binding.goToSetUserDetailsButton.setOnClickListener(view ->
+                startActivity(new Intent(getApplicationContext(), SetUserDetailsActivity.class))
+        );
+        binding.goToExchangeCards.setOnClickListener(view ->
+                startActivity(new Intent(getApplicationContext(), ExchangeBusinessCards.class))
+        );
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        String api_key = sharedPreferences.getString("api_key", "");
-        if (api_key.isEmpty()) {
-            binding.goToRegisterButton.setVisibility(View.VISIBLE);
-            binding.goToSetUserDetailsButton.setVisibility(View.GONE);
-            binding.goToRegisterButton.setOnClickListener(view ->
-                    startActivity(new Intent(getApplicationContext(), RegistrationActivity.class))
-            );
-        } else {
+        if (isUserLoggedIn()) {
             binding.goToRegisterButton.setVisibility(View.GONE);
             binding.goToSetUserDetailsButton.setVisibility(View.VISIBLE);
-            binding.goToSetUserDetailsButton.setOnClickListener(view ->
-                    startActivity(new Intent(getApplicationContext(), SetUserDetailsActivity.class))
-            );
+            binding.goToExchangeCards.setVisibility(View.VISIBLE);
+        } else {
+            binding.goToRegisterButton.setVisibility(View.VISIBLE);
+            binding.goToSetUserDetailsButton.setVisibility(View.GONE);
+            binding.goToExchangeCards.setVisibility(View.GONE);
         }
+    }
+
+    private boolean isUserLoggedIn() {
+        String api_key = sharedPreferences.getString("api_key", "");
+        return !api_key.isEmpty();
     }
 }
