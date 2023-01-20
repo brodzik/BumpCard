@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -65,34 +65,34 @@ public class MainActivity extends AppCompatActivity {
             finishAndRemoveTask();
         }
 
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Toast.makeText(this, "BumpCard requires GPS access.", Toast.LENGTH_LONG).show();
-            finishAndRemoveTask();
-        }
+//        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//            Toast.makeText(this, "BumpCard requires GPS access.", Toast.LENGTH_LONG).show();
+//            finishAndRemoveTask();
+//        }
 
-        locationManager.requestLocationUpdates(LocationManager.FUSED_PROVIDER, 0, 0, location -> {
-            currentLocation.set(location);
-            Log.i("BumpCard", "LOCATION " + currentLocation.get().toString());
-        });
+//        locationManager.requestLocationUpdates(LocationManager.FUSED_PROVIDER, 0, 0, location -> {
+//            currentLocation.set(location);
+////            Log.i("BumpCard", "LOCATION " + currentLocation.get().toString());
+//        });
 
-        sensorManager.registerListener(new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                float threshold = 2.0f;
-                float x = event.values[0];
-                float y = event.values[1];
-                float z = event.values[2];
-                float magnitude = (float) Math.sqrt(x * x + y * y + z * z);
-
-                if (magnitude > threshold) {
-                    Log.i("BumpCard", "BUMP " + magnitude + " " + Arrays.toString(event.values));
-                }
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
-            }
-        }, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+//        sensorManager.registerListener(new SensorEventListener() {
+//            @Override
+//            public void onSensorChanged(SensorEvent event) {
+//                float threshold = 2.0f;
+//                float x = event.values[0];
+//                float y = event.values[1];
+//                float z = event.values[2];
+//                float magnitude = (float) Math.sqrt(x * x + y * y + z * z);
+//
+//                if (magnitude > threshold) {
+//                    Log.i("BumpCard", "BUMP " + magnitude + " " + Arrays.toString(event.values));
+//                }
+//            }
+//
+//            @Override
+//            public void onAccuracyChanged(Sensor sensor, int i) {
+//            }
+//        }, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
 
         binding.goToRegisterButton.setOnClickListener(view ->
                 startActivity(new Intent(getApplicationContext(), RegistrationActivity.class))

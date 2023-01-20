@@ -26,7 +26,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class SetUserDetailsActivity extends AppCompatActivity {
-    private static final String API_URL = "http://192.168.1.100:5000/info";
+    private static final String API_URL = "http://192.168.1.76:5000/info";
     private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder().build();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 

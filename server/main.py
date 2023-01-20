@@ -166,7 +166,6 @@ def bump():
 
         if len(bump_candidates) > 0:
             bump2, dist = min(bump_candidates, key=lambda b: b[1])
-
             if dist < DISTANCE_THRESHOLD:
                 # Create an inactive bidirectional connection
                 db.session.add(Connection(bump1.user_id, bump2.user_id))
