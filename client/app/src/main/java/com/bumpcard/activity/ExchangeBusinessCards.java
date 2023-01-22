@@ -114,6 +114,9 @@ public class ExchangeBusinessCards extends AppCompatActivity {
     }
 
     public void registerBump(double acceleration, long time, Location location) {
+        binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
+        binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
+
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("timestamp", String.valueOf(time))
@@ -147,9 +150,10 @@ public class ExchangeBusinessCards extends AppCompatActivity {
 
         boolean isConnection = false;
         long waitTime = System.currentTimeMillis();
-        while (waitTime + 10000 < System.currentTimeMillis()) {
+        while (waitTime + 10_000L > System.currentTimeMillis() && !isConnection) {
             try {
                 isConnection = EXECUTOR_SERVICE.submit(() -> {
+                    Thread.sleep(500);
                     try (Response response = CLIENT.newCall(req).execute()) {
                         ResponseBody b = response.body();
                         JSONObject responseJson = new JSONObject(b.string());
@@ -166,9 +170,10 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             }
         }
         if (isConnection) {
-            binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
-            binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
             binding.confirmQuestion.setVisibility(View.VISIBLE);
+        } else {
+            Toast.makeText(getApplicationContext(), "Connection not found", Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 
