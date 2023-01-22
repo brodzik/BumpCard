@@ -6,7 +6,7 @@ from flask import (Flask, jsonify, redirect, render_template, request, session,
 from flask_sqlalchemy import SQLAlchemy
 from geopy import distance
 
-TIME_THRESHOLD = 500  # milliseconds
+TIME_THRESHOLD = 10000  # milliseconds
 DISTANCE_THRESHOLD = 50  # meters
 
 app = Flask(__name__)
@@ -113,10 +113,11 @@ def info(user_id):
         if (user_id is None) or (user_id == user.id):  # Return my data
             return jsonify(first_name=user.first_name, last_name=user.last_name, headline=user.headline, email=user.email, phone=user.phone)
 
-        conn = Connection.query.filter_by(user1_id=user_id, user2_id=user.id, active=True).first()
+        # conn = Connection.query.filter_by(user1_id=user_id, user2_id=user.id, active=True).first()
+        conn = Connection.query.filter_by(user1_id=user_id, user2_id=user.id).first()
 
-        if conn:  # Return stranger's data if I have permission
-            return jsonify(first_name=conn.user1.first_name, last_name=conn.user1.last_name, headline=conn.user1.headline, email=conn.user1.email, phone=conn.user1.phone)
+        # if conn:  # Return stranger's data if I have permission
+        return jsonify(first_name=conn.user1.first_name, last_name=conn.user1.last_name, headline=conn.user1.headline, email=conn.user1.email, phone=conn.user1.phone)
 
     if request.method == "POST":
         api_key = request.headers.get("api_key")

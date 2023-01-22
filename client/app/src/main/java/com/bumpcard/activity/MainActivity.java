@@ -103,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
         binding.goToExchangeCards.setOnClickListener(view ->
                 startActivity(new Intent(getApplicationContext(), ExchangeBusinessCards.class))
         );
+        binding.goToViewCards.setOnClickListener(view ->
+                startActivity(new Intent(getApplicationContext(), ViewBusinessCards.class))
+        );
     }
 
     @Override
@@ -113,10 +116,12 @@ public class MainActivity extends AppCompatActivity {
             binding.goToRegisterButton.setVisibility(View.GONE);
             binding.goToSetUserDetailsButton.setVisibility(View.VISIBLE);
             binding.goToExchangeCards.setVisibility(View.VISIBLE);
+            binding.goToViewCards.setVisibility(View.VISIBLE);
         } else {
             binding.goToRegisterButton.setVisibility(View.VISIBLE);
             binding.goToSetUserDetailsButton.setVisibility(View.GONE);
             binding.goToExchangeCards.setVisibility(View.GONE);
+            binding.goToViewCards.setVisibility(View.GONE);
         }
     }
 
