@@ -1,5 +1,7 @@
 package com.bumpcard.activity;
 
+import static com.bumpcard.config.ApiConfig.API_INFO;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -26,7 +28,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class SetUserDetailsActivity extends AppCompatActivity {
-    private static final String API_URL = "http://192.168.1.76:5000/info";
     private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder().build();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
@@ -53,7 +54,7 @@ public class SetUserDetailsActivity extends AppCompatActivity {
         super.onResume();
 
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(API_INFO)
                 .get()
                 .addHeader("api_key", sharedPreferences.getString("api_key", ""))
                 .build();
@@ -112,7 +113,7 @@ public class SetUserDetailsActivity extends AppCompatActivity {
                 .addFormDataPart("phone", binding.inputSetUserPhone.getText().toString())
                 .build();
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(API_INFO)
                 .post(body)
                 .addHeader("api_key", sharedPreferences.getString("api_key", ""))
                 .build();

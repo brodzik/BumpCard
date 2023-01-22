@@ -1,5 +1,7 @@
 package com.bumpcard.activity;
 
+import static com.bumpcard.config.ApiConfig.API_REGISTER;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -25,7 +27,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class RegistrationActivity extends AppCompatActivity {
-    private static final String API_URL = "http://192.168.1.76:5000/register";
     private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder().build();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
@@ -55,7 +56,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 .addFormDataPart("password", binding.inputRegisterPassword.getText().toString())
                 .build();
         return new Request.Builder()
-                .url(API_URL)
+                .url(API_REGISTER)
                 .post(body)
                 .build();
     }

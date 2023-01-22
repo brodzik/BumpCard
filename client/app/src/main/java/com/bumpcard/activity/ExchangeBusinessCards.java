@@ -1,5 +1,6 @@
 package com.bumpcard.activity;
 
+import static com.bumpcard.config.ApiConfig.API_BUMP;
 import static java.lang.Math.abs;
 
 import android.Manifest;
@@ -37,7 +38,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ExchangeBusinessCards extends AppCompatActivity {
-    private static final String API_URL = "http://192.168.1.76:5000/bump";
     private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder().build();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
@@ -124,7 +124,7 @@ public class ExchangeBusinessCards extends AppCompatActivity {
                 .addFormDataPart("magnitude", String.valueOf(acceleration))
                 .build();
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(API_BUMP)
                 .post(body)
                 .addHeader("api_key", sharedPreferences.getString("api_key", ""))
                 .build();
