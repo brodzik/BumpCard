@@ -136,7 +136,7 @@ def info(user_id):
 
 @app.route("/info/basic/<int:user_id>", methods=["GET"])
 def basic_info(user_id):
-    user = User.query.filter_by(user_id).first()
+    user = User.query.filter_by(id=user_id).first()
     return jsonify(first_name=user.first_name, last_name=user.last_name)
 
 

@@ -107,6 +107,15 @@
                 android:text="Confirm the exchange of business cards"
                 android:textSize="16sp" />
 
+            <TextView
+                android:id="@+id/exchange_with_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:text="Confirm exchange with user"/>
+
             <LinearLayout
                 android:id="@+id/confirm_question"
                 android:layout_width="wrap_content"

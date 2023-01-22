@@ -3,6 +3,7 @@ package com.bumpcard.activity;
 import static com.bumpcard.config.ApiConfig.API_BUMP;
 import static com.bumpcard.config.ApiConfig.API_CONNECTION;
 import static com.bumpcard.config.ApiConfig.API_CONNECTION_ALLOW;
+import static com.bumpcard.config.ApiConfig.API_INFO_BASIC;
 import static java.lang.Math.abs;
 
 import android.Manifest;
@@ -167,6 +168,43 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             }
         }
         if (isConnection) {
+            Request req2 = new Request.Builder()
+                    .url(API_CONNECTION)
+                    .get()
+                    .addHeader("api_key", sharedPreferences.getString("api_key", ""))
+                    .build();
+
+            try {
+                String name = EXECUTOR_SERVICE.submit(() -> {
+                    try (Response response = CLIENT.newCall(req2).execute()) {
+                        ResponseBody b = response.body();
+                        JSONObject responseJson = new JSONObject(b.string());
+                        JSONArray connections = responseJson.getJSONArray("connection");
+                        JSONObject user = connections.getJSONObject(0);
+                        String connectedUserId = user.getString("user2_id");
+
+                        Request req3 = new Request.Builder()
+                                .url(API_INFO_BASIC + connectedUserId)
+                                .get()
+                                .build();
+                        try (Response resp = CLIENT.newCall(req3).execute()) {
+                            ResponseBody respBody = resp.body();
+                            JSONObject jo = new JSONObject(respBody.string());
+                            return jo.getString("first_name") + " " + jo.getString("last_name");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (JSONException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return "";
+                }).get();
+                binding.exchangeWithUser.setVisibility(View.VISIBLE);
+                binding.exchangeWithUser.setText("Confirm exchange with user " + name);
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
             binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
             binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
             binding.confirmQuestion.setVisibility(View.VISIBLE);
