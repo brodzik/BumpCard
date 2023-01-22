@@ -83,7 +83,6 @@ public class ExchangeBusinessCards extends AppCompatActivity {
         binding.step1Header.setTextColor(getResources().getColor(R.color.step_done_font));
         binding.readyButton.setVisibility(View.GONE);
 
-        BumpParameters[] bumpParameters = {new BumpParameters(0, null, 0)};
         sensorManager.registerListener(new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -103,8 +102,7 @@ public class ExchangeBusinessCards extends AppCompatActivity {
                         Log.i("BumpCard", "BUMP " + magnitude + " " + Arrays.toString(event.values));
                         Log.i("Time", "Time of bump " + time);
                         Log.i("BumpCard", "LOCATION " + currentLocation.toString());
-                        bumpParameters[0] = new BumpParameters(time, currentLocation, abs(x));
-                        return;
+                        registerBump(abs(x), time, currentLocation);
                     }
                 }
             }
@@ -113,16 +111,9 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             public void onAccuracyChanged(Sensor sensor, int i) {
             }
         }, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
-
-        while (bumpParameters[0].getTime() == 0) {
-        }
-        registerBump(bumpParameters[0].getForce(), bumpParameters[0].getTime(), bumpParameters[0].getLocation());
     }
 
     public void registerBump(double acceleration, long time, Location location) {
-        binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
-        binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
-
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("timestamp", String.valueOf(time))
@@ -176,6 +167,8 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             }
         }
         if (isConnection) {
+            binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
+            binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
             binding.confirmQuestion.setVisibility(View.VISIBLE);
         } else {
             Toast.makeText(getApplicationContext(), "Connection not found", Toast.LENGTH_LONG).show();
