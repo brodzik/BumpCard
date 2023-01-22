@@ -105,7 +105,7 @@ def register():
 
 @app.route("/info", methods=["GET", "POST"], defaults={"user_id": None})
 @app.route("/info/<int:user_id>", methods=["GET"])
-def basic_info(user_id):
+def info(user_id):
     if request.method == "GET":
         api_key = request.headers.get("api_key")
         user = User.query.filter_by(api_key=api_key).first()
@@ -135,7 +135,7 @@ def basic_info(user_id):
 
 
 @app.route("/info/basic/<int:user_id>", methods=["GET"])
-def info(user_id):
+def basic_info(user_id):
     user = User.query.filter_by(user_id).first()
     return jsonify(first_name=user.first_name, last_name=user.last_name)
 
