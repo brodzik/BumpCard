@@ -134,6 +134,12 @@ def info(user_id):
     return "", 404
 
 
+@app.route("/info/basic/<int:user_id>", methods=["GET"])
+def info(user_id):
+    user = User.query.filter_by(user_id).first()
+    return jsonify(first_name=user.first_name, last_name=user.last_name)
+
+
 @app.route("/bump", methods=["GET", "POST"])
 def bump():
     if request.method == "GET":

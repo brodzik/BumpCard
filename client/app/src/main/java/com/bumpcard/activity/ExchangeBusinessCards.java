@@ -114,10 +114,6 @@ public class ExchangeBusinessCards extends AppCompatActivity {
     }
 
     public void registerBump(double acceleration, long time, Location location) {
-        binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
-        binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
-        binding.confirmQuestion.setVisibility(View.VISIBLE);
-
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("timestamp", String.valueOf(time))
@@ -141,6 +137,38 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             }).get();
         } catch (ExecutionException | InterruptedException e) {
             Log.e("ExchangeBusinessCards", e.getMessage());
+        }
+
+        Request req = new Request.Builder()
+                .url(API_CONNECTION)
+                .get()
+                .addHeader("api_key", sharedPreferences.getString("api_key", ""))
+                .build();
+
+        boolean isConnection = false;
+        long waitTime = System.currentTimeMillis();
+        while (waitTime + 10000 < System.currentTimeMillis()) {
+            try {
+                isConnection = EXECUTOR_SERVICE.submit(() -> {
+                    try (Response response = CLIENT.newCall(req).execute()) {
+                        ResponseBody b = response.body();
+                        JSONObject responseJson = new JSONObject(b.string());
+                        JSONArray connections = responseJson.getJSONArray("connection");
+                        if (connections.length() > 0) {
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        return false;
+                    }
+                    return false;
+                }).get();
+            } catch (Exception e) {
+            }
+        }
+        if (isConnection) {
+            binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
+            binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
+            binding.confirmQuestion.setVisibility(View.VISIBLE);
         }
     }
 
