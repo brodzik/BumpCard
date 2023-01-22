@@ -5,6 +5,7 @@ import static com.bumpcard.config.ApiConfig.API_INFO;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -60,11 +61,31 @@ public class SetUserDetailsActivity extends AppCompatActivity {
                 .build();
         try {
             JSONObject userInfo = new JSONObject(getUserInfo(request));
-            binding.inputSetUserFirstName.setText(userInfo.getString("first_name"));
-            binding.inputSetUserLastName.setText(userInfo.getString("last_name"));
-            binding.inputSetUserHeadline.setText(userInfo.getString("headline"));
-            binding.inputSetUserEmail.setText(userInfo.getString("email"));
-            binding.inputSetUserPhone.setText(userInfo.getString("phone"));
+
+            String firstName = userInfo.getString("first_name");
+            if (!firstName.equals("null")) {
+                binding.inputSetUserFirstName.setText(firstName);
+            }
+
+            String lastName = userInfo.getString("last_name");
+            if (!lastName.equals("null")) {
+                binding.inputSetUserLastName.setText(lastName);
+            }
+
+            String headline = userInfo.getString("headline");
+            if (!headline.equals("null")) {
+                binding.inputSetUserHeadline.setText(headline);
+            }
+
+            String email = userInfo.getString("email");
+            if (!email.equals("null")) {
+                binding.inputSetUserEmail.setText(email);
+            }
+
+            String phone = userInfo.getString("phone");
+            if (!phone.equals("null")) {
+                binding.inputSetUserPhone.setText(phone);
+            }
         } catch (JSONException e) {
             Log.e("SetUserDetailsActivity", "onResume(): " + e.getMessage());
             e.printStackTrace();
@@ -104,13 +125,19 @@ public class SetUserDetailsActivity extends AppCompatActivity {
     }
 
     private String setUserDetails() {
+        Editable firstName = binding.inputSetUserFirstName.getText();
+        Editable lastName = binding.inputSetUserLastName.getText();
+        Editable headline = binding.inputSetUserHeadline.getText();
+        Editable email = binding.inputSetUserEmail.getText();
+        Editable phone = binding.inputSetUserPhone.getText();
+
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("first_name", binding.inputSetUserFirstName.getText().toString())
-                .addFormDataPart("last_name", binding.inputSetUserLastName.getText().toString())
-                .addFormDataPart("headline", binding.inputSetUserHeadline.getText().toString())
-                .addFormDataPart("email", binding.inputSetUserEmail.getText().toString())
-                .addFormDataPart("phone", binding.inputSetUserPhone.getText().toString())
+                .addFormDataPart("first_name", firstName != null ? firstName.toString() : "")
+                .addFormDataPart("last_name", lastName != null ? lastName.toString() : "")
+                .addFormDataPart("headline", headline != null ? headline.toString() : "")
+                .addFormDataPart("email", email != null ? email.toString() : "")
+                .addFormDataPart("phone", phone != null ? phone.toString() : "")
                 .build();
         Request request = new Request.Builder()
                 .url(API_INFO)
