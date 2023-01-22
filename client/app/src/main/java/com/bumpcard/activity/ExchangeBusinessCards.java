@@ -1,6 +1,8 @@
 package com.bumpcard.activity;
 
 import static com.bumpcard.config.ApiConfig.API_BUMP;
+import static com.bumpcard.config.ApiConfig.API_CONNECTION;
+import static com.bumpcard.config.ApiConfig.API_CONNECTION_ALLOW;
 import static java.lang.Math.abs;
 
 import android.Manifest;
@@ -24,6 +26,10 @@ import androidx.core.app.ActivityCompat;
 import com.bumpcard.R;
 import com.bumpcard.databinding.ActivityExchangeBusinessCardsBinding;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +42,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class ExchangeBusinessCards extends AppCompatActivity {
     private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder().build();
@@ -86,11 +93,10 @@ public class ExchangeBusinessCards extends AppCompatActivity {
                 float magnitude = (float) Math.sqrt(x * x + y * y + z * z);
 
                 if (abs(x) > threshold) {
-                    if(currentLocation.get() == null) {
+                    if (currentLocation.get() == null) {
                         Log.i("Location", "Null last location exception");
 
-                    }
-                    else {
+                    } else {
                         sensorManager.unregisterListener(this);
                         long time = System.currentTimeMillis();
                         Log.i("BumpCard", "BUMP " + magnitude + " " + Arrays.toString(event.values));
@@ -143,6 +149,43 @@ public class ExchangeBusinessCards extends AppCompatActivity {
     }
 
     public void confirmExchange(View view) {
+        Request request = new Request.Builder()
+                .url(API_CONNECTION)
+                .get()
+                .addHeader("api_key", sharedPreferences.getString("api_key", ""))
+                .build();
+
+        int responseCode = -1;
+        try {
+            responseCode = EXECUTOR_SERVICE.submit(() -> {
+                try (Response response = CLIENT.newCall(request).execute()) {
+                    ResponseBody body = response.body();
+                    JSONObject responseJson = new JSONObject(body.string());
+                    JSONArray connections = responseJson.getJSONArray("connection");
+                    JSONObject user = connections.getJSONObject(0);
+                    String connectedUserId = user.getString("user2_id");
+
+                    Request allowConnectionRequest = new Request.Builder()
+                            .url(API_CONNECTION_ALLOW + connectedUserId)
+                            .post(new MultipartBody.Builder().addFormDataPart("as", "df").build())
+                            .addHeader("api_key", sharedPreferences.getString("api_key", ""))
+                            .build();
+                    try (Response allowConnectionResponse = CLIENT.newCall(allowConnectionRequest).execute()) {
+                        return allowConnectionResponse.code();
+                    }
+                } catch (IOException | JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (responseCode == 200) {
+            Toast.makeText(getApplicationContext(), "Connected with user", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+        }
         finish();
     }
 }
