@@ -83,6 +83,7 @@ public class ExchangeBusinessCards extends AppCompatActivity {
         binding.step1Header.setTextColor(getResources().getColor(R.color.step_done_font));
         binding.readyButton.setVisibility(View.GONE);
 
+        BumpParameters[] bumpParameters = {new BumpParameters(0, null, 0)};
         sensorManager.registerListener(new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -93,16 +94,17 @@ public class ExchangeBusinessCards extends AppCompatActivity {
                 float magnitude = (float) Math.sqrt(x * x + y * y + z * z);
 
                 if (abs(x) > threshold) {
-                    if (currentLocation.get() == null) {
+                    Location currentLocation = ExchangeBusinessCards.this.currentLocation.get();
+                    if (currentLocation == null) {
                         Log.i("Location", "Null last location exception");
-
                     } else {
                         sensorManager.unregisterListener(this);
                         long time = System.currentTimeMillis();
                         Log.i("BumpCard", "BUMP " + magnitude + " " + Arrays.toString(event.values));
                         Log.i("Time", "Time of bump " + time);
-                        Log.i("BumpCard", "LOCATION " + currentLocation.get().toString());
-                        registerBump(abs(x), time, currentLocation.get());
+                        Log.i("BumpCard", "LOCATION " + currentLocation.toString());
+                        bumpParameters[0] = new BumpParameters(time, currentLocation, abs(x));
+                        return;
                     }
                 }
             }
@@ -111,6 +113,10 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             public void onAccuracyChanged(Sensor sensor, int i) {
             }
         }, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
+
+        while (bumpParameters[0].getTime() == 0) {
+        }
+        registerBump(bumpParameters[0].getForce(), bumpParameters[0].getTime(), bumpParameters[0].getLocation());
     }
 
     public void registerBump(double acceleration, long time, Location location) {
@@ -220,5 +226,29 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
         }
         finish();
+    }
+}
+
+class BumpParameters {
+    private final long time;
+    private final Location location;
+    private final float force;
+
+    public BumpParameters(long time, Location location, float force) {
+        this.time = time;
+        this.location = location;
+        this.force = force;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public float getForce() {
+        return force;
     }
 }
