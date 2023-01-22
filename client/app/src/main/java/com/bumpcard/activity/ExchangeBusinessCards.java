@@ -75,7 +75,6 @@ public class ExchangeBusinessCards extends AppCompatActivity {
         binding.step1Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
         binding.step1Header.setTextColor(getResources().getColor(R.color.step_done_font));
         binding.readyButton.setVisibility(View.GONE);
-        binding.simulateBump.setVisibility(View.VISIBLE);
 
         sensorManager.registerListener(new SensorEventListener() {
             @Override
@@ -106,14 +105,11 @@ public class ExchangeBusinessCards extends AppCompatActivity {
             public void onAccuracyChanged(Sensor sensor, int i) {
             }
         }, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
-        // TODO: Tutaj należy uruchomić wykrywanie zderzeń
     }
 
-    public void registerBump(/*View view,*/ double acceleration, long time, Location location) {
-        // TODO: Ta metoda powinna być wywoływana przy wykrywaniu zderzeń zamiast w odpowiedzi na przycisk (zbędny parametr View)
+    public void registerBump(double acceleration, long time, Location location) {
         binding.step2Card.setCardBackgroundColor(getResources().getColor(R.color.step_done_background));
         binding.step2Header.setTextColor(getResources().getColor(R.color.step_done_font));
-        binding.simulateBump.setVisibility(View.GONE);
         binding.confirmQuestion.setVisibility(View.VISIBLE);
 
         RequestBody body = new MultipartBody.Builder()
