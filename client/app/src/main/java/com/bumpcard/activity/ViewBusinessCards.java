@@ -1,5 +1,6 @@
 package com.bumpcard.activity;
 
+import static com.bumpcard.config.ApiConfig.API_ALLOWED_CONNECTION;
 import static com.bumpcard.config.ApiConfig.API_CONNECTION;
 import static com.bumpcard.config.ApiConfig.API_INFO;
 
