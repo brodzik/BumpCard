@@ -157,7 +157,13 @@ public class ExchangeBusinessCards extends AppCompatActivity {
                         JSONObject responseJson = new JSONObject(b.string());
                         JSONArray connections = responseJson.getJSONArray("connection");
                         if (connections.length() > 0) {
-                            return true;
+                            for(int i = 0; i < connections.length(); i++){
+                                JSONObject con = connections.getJSONObject(i);
+                                if(con.getBoolean("active") == false){
+                                    return true;
+                                }
+                            }
+                            return false;
                         }
                     } catch (Exception e) {
                         return false;
@@ -180,7 +186,14 @@ public class ExchangeBusinessCards extends AppCompatActivity {
                         ResponseBody b = response.body();
                         JSONObject responseJson = new JSONObject(b.string());
                         JSONArray connections = responseJson.getJSONArray("connection");
-                        JSONObject user = connections.getJSONObject(0);
+                        int index = 0;
+                        for(int i = 0; i < connections.length();i++) {
+                            JSONObject con = connections.getJSONObject(i);
+                            if(con.getBoolean("active") == false){
+                                index = i;
+                            }
+                        }
+                        JSONObject user = connections.getJSONObject(index);
                         String connectedUserId = user.getString("user2_id");
 
                         Request req3 = new Request.Builder()
